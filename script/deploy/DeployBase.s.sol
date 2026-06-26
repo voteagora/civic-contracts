@@ -58,11 +58,12 @@ abstract contract DeployBase is Script {
                 new ERC1967Proxy{salt: keccak256(abi.encodePacked("PGGovToken"))}(
                     address(new GovernanceToken{salt: keccak256(abi.encodePacked("PGGovTokenImplementation"))}()),
                     abi.encodeWithSignature(
-                        "initialize(address,address,string,string)",
+                        "initialize(address,address,string,string,string)",
                         deployer,
                         timelockAddress,
                         "ProtocolGuild",
-                        "PGUILD"
+                        "PGUILD",
+                        ""
                     )
                 )
             )

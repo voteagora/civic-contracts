@@ -406,6 +406,39 @@
   },
   {
     "type": "function",
+    "name": "initialize",
+    "inputs": [
+      {
+        "name": "defaultAdmin",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "_timelock",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "name_",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "symbol_",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "baseTokenUri_",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "mint",
     "inputs": [
       {
@@ -519,6 +552,19 @@
   },
   {
     "type": "function",
+    "name": "setBaseURI",
+    "inputs": [
+      {
+        "name": "baseTokenUri_",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "supportsInterface",
     "inputs": [
       {
@@ -585,6 +631,19 @@
     ],
     "outputs": [],
     "stateMutability": "payable"
+  },
+  {
+    "type": "event",
+    "name": "BaseURISet",
+    "inputs": [
+      {
+        "name": "baseURI",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
   },
   {
     "type": "event",
@@ -942,11 +1001,6 @@
   {
     "type": "error",
     "name": "NotInitializing",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotTransferable",
     "inputs": []
   },
   {
