@@ -4,7 +4,6 @@ pragma solidity ^0.8.22;
 import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable-v5/access/AccessControlUpgradeable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable-v5/proxy/utils/Initializable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable-v5/proxy/utils/UUPSUpgradeable.sol";
-import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable-v5/utils/ContextUpgradeable.sol";
 import {EIP712Upgradeable} from "@openzeppelin/contracts-upgradeable-v5/utils/cryptography/EIP712Upgradeable.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {VotesUpgradeable} from "@openzeppelin/contracts-upgradeable-v5/governance/utils/VotesUpgradeable.sol";
@@ -48,8 +47,11 @@ contract GovernanceToken is
     mapping(uint256 tokenId => address) private _owners;
     // Balances of token holdings
     mapping(address owner => uint256) private _balances;
+    // Base URI for token metadata
+    string private _baseTokenUri;
 
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+    event BaseURISet(string baseURI);
 
     /*//////////////////////////////////////////////////////////////
                               CONSTRUCTOR
@@ -67,6 +69,26 @@ contract GovernanceToken is
         public
         initializer
     {
+        _initialize(defaultAdmin, _timelock, name_, symbol_, "");
+    }
+
+    function initialize(
+        address defaultAdmin,
+        address _timelock,
+        string memory name_,
+        string memory symbol_,
+        string memory baseTokenUri_
+    ) public initializer {
+        _initialize(defaultAdmin, _timelock, name_, symbol_, baseTokenUri_);
+    }
+
+    function _initialize(
+        address defaultAdmin,
+        address _timelock,
+        string memory name_,
+        string memory symbol_,
+        string memory baseTokenUri_
+    ) internal {
         __AccessControl_init();
         __UUPSUpgradeable_init();
         __EIP712_init("Protocol Guild Membership", "1");
@@ -74,6 +96,7 @@ contract GovernanceToken is
 
         _name = name_;
         _symbol = symbol_;
+        _baseTokenUri = baseTokenUri_;
 
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
         _grantRole(MINTER_ROLE, defaultAdmin);
@@ -113,10 +136,20 @@ contract GovernanceToken is
         uint256 numRecipients = recipients.length;
 
         for (uint256 i = 0; i < numRecipients; i++) {
-            _safeMint(recipients[i], startTokenId + i);
+            address recipient = recipients[i];
+            _safeMint(recipient, startTokenId + i);
+
+            if (delegates(recipient) == address(0)) {
+                _delegate(recipient, recipient);
+            }
         }
 
         _nextTokenId = startTokenId + numRecipients;
+    }
+
+    function setBaseURI(string calldata baseTokenUri_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _baseTokenUri = baseTokenUri_;
+        emit BaseURISet(baseTokenUri_);
     }
 
     function burn(uint256 tokenId) public {
@@ -144,7 +177,7 @@ contract GovernanceToken is
      * by default, can be overridden in child contracts.
      */
     function _baseURI() internal view virtual returns (string memory) {
-        return "";
+        return _baseTokenUri;
     }
 
     /**
