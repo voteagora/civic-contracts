@@ -127,8 +127,7 @@ contract GovernanceToken is
     function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
         _requireOwned(tokenId);
 
-        string memory baseURI = _baseURI();
-        return bytes(baseURI).length > 0 ? string.concat(baseURI, tokenId.toString()) : "";
+        return _baseURI();
     }
 
     function mint(address[] calldata recipients) public onlyRole(MINTER_ROLE) {
@@ -172,9 +171,7 @@ contract GovernanceToken is
     //////////////////////////////////////////////////////////////*/
 
     /**
-     * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
-     * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
-     * by default, can be overridden in child contracts.
+     * @dev Shared metadata URI returned by {tokenURI}. Empty by default.
      */
     function _baseURI() internal view virtual returns (string memory) {
         return _baseTokenUri;
